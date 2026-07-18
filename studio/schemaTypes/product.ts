@@ -19,6 +19,12 @@ export default defineType({
       validation: (r) => r.required(),
     }),
     defineField({
+      name: 'image',
+      title: t.product.image,
+      type: 'image',
+      options: { hotspot: true },
+    }),
+    defineField({
       name: 'category',
       title: t.product.category,
       type: 'string',

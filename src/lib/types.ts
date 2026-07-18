@@ -8,6 +8,8 @@ export interface Product {
   category: ProductCategory;
   series: ProductSeries;
   badge: ProductBadge;
+  /** Sanity image reference; absent in mock data, null when no photo is uploaded */
+  image?: { asset?: { _ref: string } } | null;
   /** Gun length, mm (null for parts/accessories) */
   lengthMm: number | null;
   /** Diameter designation, e.g. "170" */

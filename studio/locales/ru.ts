@@ -6,6 +6,7 @@ const ru: typeof en = {
     title: 'Товар',
     name: 'Название',
     slug: 'Slug (адрес страницы)',
+    image: 'Фото',
     category: 'Категория',
     categoryGun: 'Ружьё',
     categoryParts: 'Запчасть',

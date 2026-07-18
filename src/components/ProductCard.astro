@@ -1,6 +1,7 @@
 ---
 import type { Product } from '../lib/types';
 import { getLocale, useTranslations, localePath } from '../lib/i18n';
+import { sanityImageUrl } from '../lib/sanity';
 import GunSvg from './GunSvg.astro';
 
 interface Props {
@@ -22,6 +23,8 @@ const chips = [
   product.diameter ? `∅${product.diameter}` : null,
   product.mechanism,
 ].filter(Boolean) as string[];
+
+const photoUrl = sanityImageUrl(product.image, 640);
 ---
 
 <a
@@ -32,7 +35,9 @@ const chips = [
 >
   <div class="product-img">
     {badgeLabel && <div class:list={['product-badge', product.badge]}>{badgeLabel}</div>}
-    <GunSvg lengthMm={product.lengthMm} category={product.category} />
+    {photoUrl
+      ? <img src={photoUrl} alt={product.name} loading="lazy" />
+      : <GunSvg lengthMm={product.lengthMm} category={product.category} />}
   </div>
   <div class="product-info">
     {product.series && <div class="product-series">{t('product.series')} {product.series}</div>}

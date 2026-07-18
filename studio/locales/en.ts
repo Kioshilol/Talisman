@@ -4,6 +4,7 @@ export default {
     title: 'Product',
     name: 'Name',
     slug: 'Slug (page address)',
+    image: 'Photo',
     category: 'Category',
     categoryGun: 'Speargun',
     categoryParts: 'Spare part',

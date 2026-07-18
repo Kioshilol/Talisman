@@ -4,6 +4,7 @@ import GunSvg from '../../components/GunSvg.astro';
 import Cta from '../../components/Cta.astro';
 import { getProducts } from '../../lib/data';
 import { getLocale, useTranslations, localePath } from '../../lib/i18n';
+import { sanityImageUrl } from '../../lib/sanity';
 import type { Product } from '../../lib/types';
 
 export async function getStaticPaths() {
@@ -24,6 +25,8 @@ const badgeLabel =
   : product.badge === 'new' ? t('badge.new')
   : product.badge === 'sale' ? t('badge.sale')
   : null;
+
+const photoUrl = sanityImageUrl(product.image, 1000);
 ---
 
 <Base title={`${product.name} — TALISMAN`} description={product.description}>
@@ -38,7 +41,9 @@ const badgeLabel =
   <div class="product-detail">
     <div class="product-detail-img">
       {badgeLabel && <div class:list={['product-badge', product.badge]}>{badgeLabel}</div>}
-      <GunSvg lengthMm={product.lengthMm} category={product.category} />
+      {photoUrl
+        ? <img src={photoUrl} alt={product.name} />
+        : <GunSvg lengthMm={product.lengthMm} category={product.category} />}
     </div>
 
     <div class="product-detail-info">

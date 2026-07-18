@@ -16,23 +16,24 @@ const PRODUCTS_QUERY = `*[_type == "product"] | order(featured desc, name asc) {
   category,
   series,
   badge,
+  image,
   lengthMm,
   diameter,
   mechanism,
   priceRub,
   priceByn,
-  description,
-  features,
-  specs,
-  featured
+  "description": coalesce(description, ""),
+  "features": coalesce(features, []),
+  "specs": coalesce(specs, []),
+  "featured": coalesce(featured, false)
 }`;
 
 const POSTS_QUERY = `*[_type == "post"] | order(date desc) {
   "slug": slug.current,
   title,
   date,
-  excerpt,
-  body
+  "excerpt": coalesce(excerpt, ""),
+  "body": coalesce(body, [])
 }`;
 
 export async function getProducts(): Promise<Product[]> {

@@ -28,8 +28,10 @@ docs) are in English. Russian appears only in site content and locale dictionari
 - **Cart:** localStorage (`talisman_cart_v1`), a global script in `src/layouts/Base.astro`
   exposes `window.TalismanCart`. Checkout is a form on `/cart`: POST to
   `PUBLIC_ORDER_ENDPOINT`; when the endpoint is empty, mailto to info@talisman.by.
-- **Product art:** parametric SVG `src/components/GunSvg.astro`
-  (barrel length scales with `lengthMm`, separate variants for parts/accessories).
+- **Product art:** an uploaded Sanity photo (`image` field, rendered via
+  `sanityImageUrl` from `src/lib/sanity.ts`) when present; otherwise the parametric SVG
+  `src/components/GunSvg.astro` (barrel length scales with `lengthMm`, separate variants
+  for parts/accessories).
 - **Design:** the whole design system is in `src/styles/global.css` (CSS variables, light theme,
   green accent #1a7a52, Playfair Display + DM Sans fonts). The reference mockup is a
   single-file `talisman-shop.html` (kept by the client); build new pages from existing
