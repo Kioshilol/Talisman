@@ -65,19 +65,7 @@ const orderEndpoint = (import.meta.env.PUBLIC_ORDER_ENDPOINT as string | undefin
   <template data-i18n-remove>{t('cart.remove')}</template>
 
   <script>
-    type CartItem = {
-      slug: string;
-      name: string;
-      priceRub: number;
-      priceByn: number;
-      qty: number;
-    };
-
-    type CartApi = {
-      readCart: () => CartItem[];
-      writeCart: (items: CartItem[]) => void;
-      updateBadge: () => void;
-    };
+    import { readCart, writeCart } from '../lib/cart-client';
 
     const root = document.querySelector<HTMLElement>('[data-cart-root]')!;
     const emptyBlock = root.querySelector<HTMLElement>('[data-cart-empty]')!;
@@ -86,12 +74,10 @@ const orderEndpoint = (import.meta.env.PUBLIC_ORDER_ENDPOINT as string | undefin
     const totalEl = root.querySelector<HTMLElement>('[data-cart-total]')!;
     const removeLabel = document.querySelector('[data-i18n-remove]')?.textContent ?? 'Убрать';
 
-    const cart = (): CartApi => (window as any).TalismanCart;
-
     const fmt = (n: number) => n.toLocaleString('ru-RU') + ' ₽';
 
     function render() {
-      const items = cart().readCart();
+      const items = readCart();
       const isEmpty = items.length === 0;
       emptyBlock.hidden = !isEmpty;
       contentBlock.hidden = isEmpty;
@@ -144,16 +130,16 @@ const orderEndpoint = (import.meta.env.PUBLIC_ORDER_ENDPOINT as string | undefin
     }
 
     function changeQty(slug: string, delta: number) {
-      const items = cart().readCart();
+      const items = readCart();
       const item = items.find((i) => i.slug === slug);
       if (!item) return;
       item.qty += delta;
-      cart().writeCart(item.qty <= 0 ? items.filter((i) => i.slug !== slug) : items);
+      writeCart(item.qty <= 0 ? items.filter((i) => i.slug !== slug) : items);
       render();
     }
 
     function removeItem(slug: string) {
-      cart().writeCart(cart().readCart().filter((i) => i.slug !== slug));
+      writeCart(readCart().filter((i) => i.slug !== slug));
       render();
     }
 
@@ -165,7 +151,7 @@ const orderEndpoint = (import.meta.env.PUBLIC_ORDER_ENDPOINT as string | undefin
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       const data = new FormData(form);
-      const items = cart().readCart();
+      const items = readCart();
       const orderLines = items
         .map((i) => `${i.name} x${i.qty} = ${i.priceRub * i.qty} RUB`)
         .join('\n');
@@ -191,7 +177,7 @@ const orderEndpoint = (import.meta.env.PUBLIC_ORDER_ENDPOINT as string | undefin
           if (!res.ok) throw new Error(String(res.status));
           note.textContent = note.dataset.msgSuccess ?? '';
           note.classList.add('success');
-          cart().writeCart([]);
+          writeCart([]);
           render();
           form.reset();
         } catch {

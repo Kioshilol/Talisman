@@ -25,8 +25,9 @@ docs) are in English. Russian appears only in site content and locale dictionari
   `studio/locales/` dictionaries (ru by default, switch via `SANITY_STUDIO_LOCALE`).
 - **i18n:** RU is primary, no prefix; EN is `/en/...` via fallback rewrite
   (astro.config.mjs). UI strings live in `src/lib/i18n.ts` dictionaries; EN content is still Russian.
-- **Cart:** localStorage (`talisman_cart_v1`), a global script in `src/layouts/Base.astro`
-  exposes `window.TalismanCart`. Checkout is a form on `/cart`: POST to
+- **Cart:** localStorage (`talisman_cart_v1`) via the shared client module
+  `src/lib/cart-client.ts`, imported by the Base layout script (add-to-cart, badge)
+  and the `/cart` page. Checkout is a form on `/cart`: POST to
   `PUBLIC_ORDER_ENDPOINT`; when the endpoint is empty, mailto to info@talisman.by.
 - **Product art:** an uploaded Sanity photo (`image` field, rendered via
   `sanityImageUrl` from `src/lib/sanity.ts`) when present; otherwise the parametric SVG
