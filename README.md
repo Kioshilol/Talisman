@@ -47,13 +47,14 @@ The cart lives in `localStorage`, no backend required. Checkout:
 
 Project `786bstzj`, dataset `production` (managed at https://www.sanity.io/manage).
 
-- Content editing: `cd studio && npm run dev` → `localhost:3333`.
+- Content editing: https://talisman.sanity.studio (or locally: `cd studio && npm run dev` → `localhost:3333`).
 - Site build reads the CMS when `PUBLIC_SANITY_PROJECT_ID` is set (copy `.env.example` → `.env`).
 - Studio field labels are localized via dictionaries in `studio/locales/`
   (Russian by default, switch with `SANITY_STUDIO_LOCALE`).
 
 ## Deploy
 
-The build output is static files in `dist/`. Any static hosting works: Netlify, Vercel,
-Cloudflare Pages. After content updates in Sanity the site must be rebuilt (set up a
-"Sanity to rebuild" webhook on the hosting).
+Hosted on Netlify: https://sprightly-haupia-bda009.netlify.app (builds from the `main`
+branch of https://github.com/Kioshilol/Talisman). Publishing in Sanity Studio triggers
+a rebuild automatically via the `netlify-rebuild` webhook. The custom domain
+`talismanseagun.ru` is pending DNS setup at the registrar (REG.RU).
