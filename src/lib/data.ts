@@ -25,7 +25,8 @@ const PRODUCTS_QUERY = `*[_type == "product"] | order(featured desc, name asc) {
   "description": coalesce(description, ""),
   "features": coalesce(features, []),
   "specs": coalesce(specs, []),
-  "featured": coalesce(featured, false)
+  "featured": coalesce(featured, false),
+  "hero": coalesce(hero, false)
 }`;
 
 const POSTS_QUERY = `*[_type == "post"] | order(date desc) {
@@ -51,6 +52,12 @@ export async function getProduct(slug: string): Promise<Product | undefined> {
 export async function getFeaturedProducts(limit = 6): Promise<Product[]> {
   const products = await getProducts();
   return products.filter((p) => p.featured).slice(0, limit);
+}
+
+/** Product for the homepage hero card: the hero-flagged one, else the first featured */
+export async function getHeroProduct(): Promise<Product | undefined> {
+  const products = await getProducts();
+  return products.find((p) => p.hero) ?? products.find((p) => p.featured);
 }
 
 export async function getPosts(): Promise<Post[]> {

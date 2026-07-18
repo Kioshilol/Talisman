@@ -25,6 +25,8 @@ export default {
     specLabel: 'Parameter',
     specValue: 'Value',
     featured: 'Show on homepage',
+    hero: 'Show in the homepage hero',
+    heroHint: 'The big card at the top of the homepage. If several products have this, the first one wins.',
   },
   post: {
     title: 'News post',

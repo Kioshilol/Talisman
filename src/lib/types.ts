@@ -1,5 +1,5 @@
 export type ProductCategory = 'gun' | 'parts' | 'accessories';
-export type ProductSeries = 'Phantom' | 'Vortex' | 'Trident' | null;
+export type ProductSeries = 'Phantom' | 'Vortex' | 'Trident' | 'Benger' | null;
 export type ProductBadge = 'hit' | 'new' | 'sale' | null;
 
 export interface Product {
@@ -21,6 +21,8 @@ export interface Product {
   features: string[];
   specs: { label: string; value: string }[];
   featured: boolean;
+  /** Shown in the homepage hero card; absent in mock data */
+  hero?: boolean;
 }
 
 export interface Post {

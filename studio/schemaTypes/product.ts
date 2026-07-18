@@ -43,7 +43,7 @@ export default defineType({
       name: 'series',
       title: t.product.series,
       type: 'string',
-      options: { list: ['Phantom', 'Vortex', 'Trident'] },
+      options: { list: ['Phantom', 'Vortex', 'Trident', 'Benger'] },
       hidden: ({ document }) => document?.category !== 'gun',
     }),
     defineField({
@@ -88,6 +88,13 @@ export default defineType({
       name: 'featured',
       title: t.product.featured,
       type: 'boolean',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'hero',
+      title: t.product.hero,
+      type: 'boolean',
+      description: t.product.heroHint,
       initialValue: false,
     }),
   ],

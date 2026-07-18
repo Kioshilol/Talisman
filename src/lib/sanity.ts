@@ -13,7 +13,9 @@ export const sanityClient: SanityClient | null = sanityEnabled
       projectId: projectId!,
       dataset,
       apiVersion: '2026-07-01',
-      useCdn: true,
+      // Direct API instead of the CDN: builds are rare and must always get
+      // fresh data (the CDN can lag right after publishing)
+      useCdn: false,
     })
   : null;
 

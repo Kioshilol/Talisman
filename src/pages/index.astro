@@ -4,14 +4,16 @@ import ProductCard from '../components/ProductCard.astro';
 import Features from '../components/Features.astro';
 import Cta from '../components/Cta.astro';
 import GunSvg from '../components/GunSvg.astro';
-import { getFeaturedProducts } from '../lib/data';
+import { getFeaturedProducts, getHeroProduct } from '../lib/data';
 import { getLocale, useTranslations, localePath } from '../lib/i18n';
+import { sanityImageUrl } from '../lib/sanity';
 
 const locale = getLocale(Astro.currentLocale);
 const t = useTranslations(locale);
 
 const featured = await getFeaturedProducts(6);
-const heroProduct = featured[0];
+const heroProduct = await getHeroProduct();
+const heroPhoto = sanityImageUrl(heroProduct?.image, 800);
 
 const stats = [
   { num: '3', label: t('stats.series') },
@@ -34,7 +36,9 @@ const stats = [
     </div>
     <div class="hero-visual">
       <div class="hero-card">
-        <GunSvg lengthMm={heroProduct?.lengthMm} category="gun" />
+        {heroPhoto
+          ? <img src={heroPhoto} alt={heroProduct?.name} />
+          : <GunSvg lengthMm={heroProduct?.lengthMm} category="gun" />}
         {heroProduct && (
           <div class="hero-card-label">
             <span class="hero-card-name">{heroProduct.name}</span>
