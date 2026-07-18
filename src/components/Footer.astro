@@ -1,0 +1,20 @@
+---
+import { getLocale, useTranslations, localePath } from '../lib/i18n';
+
+const locale = getLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="footer-left">
+    <div class="footer-brand">TALISMAN</div>
+    <div class="footer-copy">&copy; {year} {t('footer.rights')}</div>
+  </div>
+  <div class="footer-links">
+    <a href="https://youtube.com" target="_blank" rel="noopener">YouTube</a>
+    <a href={localePath(locale, '/service')}>{t('nav.service')}</a>
+    <a href={localePath(locale, '/news')}>{t('nav.news')}</a>
+    <a href="mailto:info@talisman.by">info@talisman.by</a>
+  </div>
+</footer>

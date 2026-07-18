@@ -1,0 +1,32 @@
+---
+import { getLocale, useTranslations, localePath, switchLocalePath } from '../lib/i18n';
+
+const locale = getLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? path === localePath(locale, '/') : path.startsWith(localePath(locale, href));
+---
+
+<div class="topbar">
+  <a class="logo" href={localePath(locale, '/')}>TALISMAN</a>
+  <nav class="nav">
+    <a href={localePath(locale, '/catalog')} class:list={{ active: isActive('/catalog') }}>{t('nav.catalog')}</a>
+    <a href={localePath(locale, '/about')} class:list={{ active: isActive('/about') }}>{t('nav.about')}</a>
+    <a href={localePath(locale, '/service')} class:list={{ active: isActive('/service') }}>{t('nav.service')}</a>
+    <a href={localePath(locale, '/news')} class:list={{ active: isActive('/news') }}>{t('nav.news')}</a>
+    <a href={localePath(locale, '/about') + '#contacts'}>{t('nav.contacts')}</a>
+  </nav>
+  <div class="nav-right">
+    <div class="lang-switch">
+      <a class:list={['lang-btn', { active: locale === 'ru' }]} href={switchLocalePath(path, 'ru')}>{t('lang.ru')}</a>
+      <a class:list={['lang-btn', { active: locale === 'en' }]} href={switchLocalePath(path, 'en')}>{t('lang.en')}</a>
+    </div>
+    <a class="cart-icon" href={localePath(locale, '/cart')} aria-label={t('cart.title')}>
+      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <div class="cart-badge" data-cart-badge>0</div>
+    </a>
+  </div>
+</div>
+
+<div class="divider"></div>

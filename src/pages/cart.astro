@@ -1,0 +1,215 @@
+---
+import Base from '../layouts/Base.astro';
+import { getLocale, useTranslations, localePath } from '../lib/i18n';
+
+const locale = getLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+
+// Order intake endpoint (Formspree/Basin/own webhook). Empty means mailto fallback.
+const orderEndpoint = (import.meta.env.PUBLIC_ORDER_ENDPOINT as string | undefined) ?? '';
+---
+
+<Base title={`${t('cart.title')} — TALISMAN`}>
+  <div class="page-hero">
+    <h1>{t('cart.title')}</h1>
+  </div>
+
+  <div data-cart-root data-endpoint={orderEndpoint}>
+    <div class="cart-empty" data-cart-empty hidden>
+      <h2>{t('cart.empty')}</h2>
+      <p>{t('cart.emptyHint')}</p>
+      <a class="btn-primary" href={localePath(locale, '/catalog')}>{t('hero.cta.catalog')}</a>
+    </div>
+
+    <div data-cart-content hidden>
+      <table class="cart-table">
+        <thead>
+          <tr>
+            <th>{t('cart.item')}</th>
+            <th>{t('cart.qty')}</th>
+            <th>{t('cart.price')}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody data-cart-items></tbody>
+      </table>
+
+      <div class="cart-total-row">
+        <span>{t('cart.total')}:</span>
+        <span class="sum" data-cart-total></span>
+      </div>
+
+      <form class="order-form" data-order-form>
+        <h2>{t('cart.orderTitle')}</h2>
+        <p>{t('cart.orderHint')}</p>
+        <div class="form-field">
+          <label for="order-name">{t('form.name')}</label>
+          <input id="order-name" name="name" type="text" required />
+        </div>
+        <div class="form-field">
+          <label for="order-phone">{t('form.phone')}</label>
+          <input id="order-phone" name="phone" type="text" required />
+        </div>
+        <div class="form-field">
+          <label for="order-comment">{t('form.comment')}</label>
+          <textarea id="order-comment" name="comment"></textarea>
+        </div>
+        <button class="btn-primary" type="submit">{t('form.submit')}</button>
+        <div class="form-note" data-form-note
+          data-msg-success={t('form.success')}
+          data-msg-error={t('form.error')}></div>
+      </form>
+    </div>
+  </div>
+
+  <template data-i18n-remove>{t('cart.remove')}</template>
+
+  <script>
+    type CartItem = {
+      slug: string;
+      name: string;
+      priceRub: number;
+      priceByn: number;
+      qty: number;
+    };
+
+    type CartApi = {
+      readCart: () => CartItem[];
+      writeCart: (items: CartItem[]) => void;
+      updateBadge: () => void;
+    };
+
+    const root = document.querySelector<HTMLElement>('[data-cart-root]')!;
+    const emptyBlock = root.querySelector<HTMLElement>('[data-cart-empty]')!;
+    const contentBlock = root.querySelector<HTMLElement>('[data-cart-content]')!;
+    const itemsBody = root.querySelector<HTMLElement>('[data-cart-items]')!;
+    const totalEl = root.querySelector<HTMLElement>('[data-cart-total]')!;
+    const removeLabel = document.querySelector('[data-i18n-remove]')?.textContent ?? 'Убрать';
+
+    const cart = (): CartApi => (window as any).TalismanCart;
+
+    const fmt = (n: number) => n.toLocaleString('ru-RU') + ' ₽';
+
+    function render() {
+      const items = cart().readCart();
+      const isEmpty = items.length === 0;
+      emptyBlock.hidden = !isEmpty;
+      contentBlock.hidden = isEmpty;
+      if (isEmpty) return;
+
+      itemsBody.innerHTML = '';
+      for (const item of items) {
+        const tr = document.createElement('tr');
+
+        const nameTd = document.createElement('td');
+        const link = document.createElement('a');
+        link.className = 'cart-item-name';
+        link.href = `/catalog/${item.slug}`;
+        link.textContent = item.name;
+        nameTd.appendChild(link);
+
+        const qtyTd = document.createElement('td');
+        const qty = document.createElement('div');
+        qty.className = 'qty-control';
+        const minus = document.createElement('button');
+        minus.type = 'button';
+        minus.textContent = '−';
+        minus.addEventListener('click', () => changeQty(item.slug, -1));
+        const count = document.createElement('span');
+        count.textContent = String(item.qty);
+        const plus = document.createElement('button');
+        plus.type = 'button';
+        plus.textContent = '+';
+        plus.addEventListener('click', () => changeQty(item.slug, 1));
+        qty.append(minus, count, plus);
+        qtyTd.appendChild(qty);
+
+        const priceTd = document.createElement('td');
+        priceTd.textContent = fmt(item.priceRub * item.qty);
+
+        const removeTd = document.createElement('td');
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-btn';
+        removeBtn.type = 'button';
+        removeBtn.textContent = removeLabel;
+        removeBtn.addEventListener('click', () => removeItem(item.slug));
+        removeTd.appendChild(removeBtn);
+
+        tr.append(nameTd, qtyTd, priceTd, removeTd);
+        itemsBody.appendChild(tr);
+      }
+
+      const total = items.reduce((sum, item) => sum + item.priceRub * item.qty, 0);
+      totalEl.textContent = fmt(total);
+    }
+
+    function changeQty(slug: string, delta: number) {
+      const items = cart().readCart();
+      const item = items.find((i) => i.slug === slug);
+      if (!item) return;
+      item.qty += delta;
+      cart().writeCart(item.qty <= 0 ? items.filter((i) => i.slug !== slug) : items);
+      render();
+    }
+
+    function removeItem(slug: string) {
+      cart().writeCart(cart().readCart().filter((i) => i.slug !== slug));
+      render();
+    }
+
+    // Order submission
+    const form = root.querySelector<HTMLFormElement>('[data-order-form]')!;
+    const note = root.querySelector<HTMLElement>('[data-form-note]')!;
+    const endpoint = root.dataset.endpoint ?? '';
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const items = cart().readCart();
+      const orderLines = items
+        .map((i) => `${i.name} x${i.qty} = ${i.priceRub * i.qty} RUB`)
+        .join('\n');
+      const total = items.reduce((sum, i) => sum + i.priceRub * i.qty, 0);
+
+      const payload = {
+        name: data.get('name'),
+        phone: data.get('phone'),
+        comment: data.get('comment'),
+        order: orderLines,
+        totalRub: total,
+      };
+
+      note.className = 'form-note';
+
+      if (endpoint) {
+        try {
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) throw new Error(String(res.status));
+          note.textContent = note.dataset.msgSuccess ?? '';
+          note.classList.add('success');
+          cart().writeCart([]);
+          render();
+          form.reset();
+        } catch {
+          note.textContent = note.dataset.msgError ?? '';
+          note.classList.add('error');
+        }
+      } else {
+        // No endpoint configured, open an email draft with the order summary
+        const body = encodeURIComponent(
+          `Заказ TALISMAN\n\n${orderLines}\n\nИтого: ${total} RUB\n\nИмя: ${payload.name}\nКонтакт: ${payload.phone}\nКомментарий: ${payload.comment ?? ''}`
+        );
+        window.location.href = `mailto:info@talisman.by?subject=${encodeURIComponent('Заказ с сайта')}&body=${body}`;
+        note.textContent = note.dataset.msgSuccess ?? '';
+        note.classList.add('success');
+      }
+    });
+
+    render();
+    document.addEventListener('cart:changed', render);
+  </script>
+</Base>

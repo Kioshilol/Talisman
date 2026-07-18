@@ -1,0 +1,64 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import Cta from '../../components/Cta.astro';
+import { getProducts } from '../../lib/data';
+import { getLocale, useTranslations } from '../../lib/i18n';
+
+const locale = getLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+
+const products = await getProducts();
+const series = [...new Set(products.map((p) => p.series).filter(Boolean))] as string[];
+
+const filters = [
+  { value: 'all', label: t('filter.all') },
+  ...series.map((s) => ({ value: `series:${s}`, label: s })),
+  { value: 'category:parts', label: t('filter.parts') },
+  { value: 'category:accessories', label: t('filter.accessories') },
+];
+---
+
+<Base title={`${t('catalog.pageTitle')} — TALISMAN`}>
+  <div class="page-hero">
+    <h1>{t('catalog.title')}</h1>
+  </div>
+
+  <div class="filters" data-catalog-filters>
+    {filters.map((filter, i) => (
+      <button class:list={['filter-btn', { active: i === 0 }]} type="button" data-filter={filter.value}>
+        {filter.label}
+      </button>
+    ))}
+  </div>
+
+  <div class="products" data-catalog-grid>
+    {products.map((product) => <ProductCard product={product} />)}
+  </div>
+
+  <Cta />
+
+  <script>
+    const filterBar = document.querySelector('[data-catalog-filters]');
+    const grid = document.querySelector('[data-catalog-grid]');
+
+    filterBar?.addEventListener('click', (event) => {
+      const btn = (event.target as HTMLElement).closest<HTMLElement>('[data-filter]');
+      if (!btn || !grid) return;
+
+      filterBar.querySelectorAll('.filter-btn').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const filter = btn.dataset.filter ?? 'all';
+      grid.querySelectorAll<HTMLElement>('.product-card').forEach((card) => {
+        let visible = true;
+        if (filter.startsWith('series:')) {
+          visible = card.dataset.series === filter.slice(7);
+        } else if (filter.startsWith('category:')) {
+          visible = card.dataset.category === filter.slice(9);
+        }
+        card.style.display = visible ? '' : 'none';
+      });
+    });
+  </script>
+</Base>

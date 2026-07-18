@@ -1,0 +1,12 @@
+---
+import { getLocale, useTranslations } from '../lib/i18n';
+
+const locale = getLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+---
+
+<div class="cta">
+  <h2>{t('cta.title')}</h2>
+  <p>{t('cta.text')}</p>
+  <a class="btn-white" href="mailto:info@talisman.by">{t('cta.button')}</a>
+</div>

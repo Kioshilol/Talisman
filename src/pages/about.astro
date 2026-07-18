@@ -1,0 +1,38 @@
+---
+import Base from '../layouts/Base.astro';
+import Features from '../components/Features.astro';
+import Cta from '../components/Cta.astro';
+import { getLocale, useTranslations } from '../lib/i18n';
+
+const locale = getLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+---
+
+<Base title={`${t('about.title')} — TALISMAN`}>
+  <div class="page-hero">
+    <h1>{t('about.title')}</h1>
+  </div>
+
+  <div class="prose">
+    <p>
+      TALISMAN — производитель пневматических ружей для подводной охоты. Более 15 лет мы
+      выпускаем серийные ружья с полной взаимозаменяемостью деталей: любая запчасть встаёт
+      на место без подгонки, а обслуживание доступно каждому охотнику.
+    </p>
+    <p>
+      Каждое ружьё перед отправкой проходит индивидуальную проверку боя и герметичности.
+      Конструктор лично отвечает на вопросы покупателей и помогает с подбором модели под
+      конкретные условия охоты.
+    </p>
+    <h2 id="contacts">{t('nav.contacts')}</h2>
+    <ul>
+      <li>E-mail: <a href="mailto:info@talisman.by">info@talisman.by</a></li>
+      <li>YouTube: <a href="https://youtube.com" target="_blank" rel="noopener">канал с обзорами и тестами</a></li>
+      <li>География доставки: Беларусь, Россия, Латвия, Казахстан, Армения и другие страны</li>
+    </ul>
+  </div>
+
+  <Features />
+
+  <Cta />
+</Base>

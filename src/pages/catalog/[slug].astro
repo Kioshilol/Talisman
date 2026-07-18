@@ -1,0 +1,92 @@
+---
+import Base from '../../layouts/Base.astro';
+import GunSvg from '../../components/GunSvg.astro';
+import Cta from '../../components/Cta.astro';
+import { getProducts } from '../../lib/data';
+import { getLocale, useTranslations, localePath } from '../../lib/i18n';
+import type { Product } from '../../lib/types';
+
+export async function getStaticPaths() {
+  const products = await getProducts();
+  return products.map((product) => ({
+    params: { slug: product.slug },
+    props: { product },
+  }));
+}
+
+const { product } = Astro.props as { product: Product };
+
+const locale = getLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+
+const badgeLabel =
+  product.badge === 'hit' ? t('badge.hit')
+  : product.badge === 'new' ? t('badge.new')
+  : product.badge === 'sale' ? t('badge.sale')
+  : null;
+---
+
+<Base title={`${product.name} — TALISMAN`} description={product.description}>
+  <nav class="breadcrumbs">
+    <a href={localePath(locale, '/')}>TALISMAN</a>
+    <span>/</span>
+    <a href={localePath(locale, '/catalog')}>{t('nav.catalog')}</a>
+    <span>/</span>
+    <span>{product.name}</span>
+  </nav>
+
+  <div class="product-detail">
+    <div class="product-detail-img">
+      {badgeLabel && <div class:list={['product-badge', product.badge]}>{badgeLabel}</div>}
+      <GunSvg lengthMm={product.lengthMm} category={product.category} />
+    </div>
+
+    <div class="product-detail-info">
+      {product.series && <div class="product-series">{t('product.series')} {product.series}</div>}
+      <h1>{product.name}</h1>
+      <p>{product.description}</p>
+
+      <div class="product-detail-price">
+        <span class="main">{product.priceRub.toLocaleString('ru-RU')} &#8381;</span>
+        <span class="sub">{product.priceByn.toLocaleString('ru-RU')} бел.руб.</span>
+      </div>
+
+      <div class="product-detail-actions">
+        <button
+          class="btn-primary"
+          type="button"
+          data-add-to-cart
+          data-slug={product.slug}
+          data-name={product.name}
+          data-price-rub={product.priceRub}
+          data-price-byn={product.priceByn}
+        >{t('product.addToCart')}</button>
+        <a class="btn-outline" href={localePath(locale, '/catalog')}>{t('product.backToCatalog')}</a>
+      </div>
+
+      {product.specs.length > 0 && (
+        <div class="detail-block">
+          <h2>{t('product.specs')}</h2>
+          <table class="spec-table">
+            <tbody>
+              {product.specs.map((spec) => (
+                <tr><td>{spec.label}</td><td>{spec.value}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {product.features.length > 0 && (
+        <div class="detail-block">
+          <h2>{t('product.features')}</h2>
+          <ul class="feature-list">
+            {product.features.map((feature) => <li>{feature}</li>)}
+          </ul>
+        </div>
+      )}
+    </div>
+  </div>
+
+  <Cta />
+</Base>

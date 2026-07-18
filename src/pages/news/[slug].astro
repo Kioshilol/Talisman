@@ -1,0 +1,42 @@
+---
+import Base from '../../layouts/Base.astro';
+import Cta from '../../components/Cta.astro';
+import { getPosts } from '../../lib/data';
+import { getLocale, useTranslations, localePath } from '../../lib/i18n';
+import type { Post } from '../../lib/types';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props as { post: Post };
+
+const locale = getLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+const dateFormat = new Intl.DateTimeFormat(locale === 'en' ? 'en-GB' : 'ru-RU', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+---
+
+<Base title={`${post.title} — TALISMAN`} description={post.excerpt}>
+  <nav class="breadcrumbs">
+    <a href={localePath(locale, '/')}>TALISMAN</a>
+    <span>/</span>
+    <a href={localePath(locale, '/news')}>{t('news.title')}</a>
+  </nav>
+
+  <article class="article">
+    <div class="post-date">{dateFormat.format(new Date(post.date))}</div>
+    <h1>{post.title}</h1>
+    {post.body.map((paragraph) => <p>{paragraph}</p>)}
+    <a class="section-link" href={localePath(locale, '/news')}>&larr; {t('news.backToNews')}</a>
+  </article>
+
+  <Cta />
+</Base>

@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+  # Public identifiers, safe to commit; secrets stay in the Netlify UI
+  PUBLIC_SANITY_PROJECT_ID = "786bstzj"
+  PUBLIC_SANITY_DATASET = "production"

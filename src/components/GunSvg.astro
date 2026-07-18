@@ -1,0 +1,88 @@
+---
+/**
+ * Parametric product illustration in the mockup style.
+ * For guns the barrel length scales with lengthMm;
+ * parts and accessories get their own pictograms.
+ */
+interface Props {
+  lengthMm?: number | null;
+  category?: 'gun' | 'parts' | 'accessories';
+}
+const { lengthMm = 750, category = 'gun' } = Astro.props;
+
+// Barrel length in viewBox 360x100 coordinates
+const mm = lengthMm ?? 750;
+const shaft = Math.max(150, Math.min(290, Math.round(mm * 0.32)));
+const shaftEnd = 30 + shaft;              // barrel end
+const bodyW = Math.max(100, Math.round(shaft * 0.55));
+const bodyX = shaftEnd - bodyW;           // receiver flush with the barrel end
+const gripX = shaftEnd + 2;               // grip behind the receiver
+const uid = `g${Math.random().toString(36).slice(2, 8)}`;
+---
+
+{category === 'gun' && (
+  <svg viewBox="0 0 360 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polygon points={`5,50 30,44 30,56`} fill="#6b8f7d" />
+    <rect x="30" y="47" width={shaft} height="6" rx="1" fill={`url(#${uid}-s)`} />
+    <rect x="30" y="48" width={shaft} height="1.5" fill="rgba(255,255,255,0.25)" />
+    <rect x={bodyX} y="38" width={bodyW} height="24" rx="4" fill={`url(#${uid}-b)`} />
+    {[0.25, 0.5, 0.75].map((k) => (
+      <rect x={bodyX + bodyW * k} y="42" width="2" height="16" rx="1" fill="rgba(0,0,0,0.06)" />
+    ))}
+    <rect x={bodyX - 6} y="40" width="10" height="20" rx="3" fill="#7da68e" />
+    <circle cx={bodyX - 1} cy="50" r="3" fill="#5a8a70" stroke="#1a7a52" stroke-width="0.5" opacity="0.4" />
+    <path
+      d={`M${bodyX + bodyW * 0.6},62 Q${bodyX + bodyW * 0.6},78 ${bodyX + bodyW * 0.6 + 15},78 Q${bodyX + bodyW * 0.6 + 30},78 ${bodyX + bodyW * 0.6 + 30},62`}
+      stroke="#8aab9a" stroke-width="2.5" fill="none" stroke-linecap="round" />
+    <rect x={bodyX + bodyW * 0.6 + 12} y="62" width="4" height="10" rx="1.5" fill="#7da68e" />
+    <rect x={gripX} y="34" width="16" height="32" rx="4" fill={`url(#${uid}-g)`} />
+    {[38, 44, 50, 56].map((y) => (
+      <rect x={gripX + 2} y={y} width="12" height="2" rx="1" fill="rgba(0,0,0,0.06)" />
+    ))}
+    <rect x={gripX + 14} y="38" width="24" height="24" rx="6" fill="#a3c2b0" />
+    <circle cx={gripX + 26} cy="50" r="4" fill="#8aab9a" stroke="#6b917e" stroke-width="1" />
+    <circle cx={gripX + 26} cy="50" r="1.8" fill="#1a7a52" opacity="0.2" />
+    <defs>
+      <linearGradient id={`${uid}-s`} x1="30" y1="47" x2="30" y2="53" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#8aab9a" /><stop offset="1" stop-color="#6b917e" />
+      </linearGradient>
+      <linearGradient id={`${uid}-b`} x1={bodyX} y1="38" x2={bodyX} y2="62" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#c5d9cd" /><stop offset="1" stop-color="#a3c2b0" />
+      </linearGradient>
+      <linearGradient id={`${uid}-g`} x1={gripX} y1="34" x2={gripX} y2="66" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#9cbdaa" /><stop offset="1" stop-color="#7da68e" />
+      </linearGradient>
+    </defs>
+  </svg>
+)}
+
+{category === 'parts' && (
+  <svg viewBox="0 0 360 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="20,50 52,42 52,58" fill="#6b8f7d" />
+    <rect x="52" y="46.5" width="250" height="7" rx="2" fill={`url(#${uid}-s)`} />
+    <rect x="52" y="48" width="250" height="1.5" fill="rgba(255,255,255,0.3)" />
+    <rect x="296" y="42" width="14" height="16" rx="3" fill="#7da68e" />
+    <rect x="310" y="45" width="26" height="10" rx="3" fill="#a3c2b0" />
+    <defs>
+      <linearGradient id={`${uid}-s`} x1="52" y1="46" x2="52" y2="54" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#9cbdaa" /><stop offset="1" stop-color="#7da68e" />
+      </linearGradient>
+    </defs>
+  </svg>
+)}
+
+{category === 'accessories' && (
+  <svg viewBox="0 0 360 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="180" cy="50" r="34" fill={`url(#${uid}-b)`} />
+    <circle cx="180" cy="50" r="24" fill="#8aab9a" />
+    <circle cx="180" cy="50" r="14" fill="#c5d9cd" />
+    <circle cx="180" cy="50" r="4" fill="#1a7a52" opacity="0.35" />
+    <path d="M214,50 Q250,50 262,38" stroke="#7da68e" stroke-width="2.5" fill="none" stroke-linecap="round" />
+    <rect x="140" y="80" width="80" height="8" rx="3" fill="#a3c2b0" />
+    <defs>
+      <linearGradient id={`${uid}-b`} x1="146" y1="16" x2="146" y2="84" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#c5d9cd" /><stop offset="1" stop-color="#8aab9a" />
+      </linearGradient>
+    </defs>
+  </svg>
+)}

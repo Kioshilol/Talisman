@@ -1,0 +1,71 @@
+---
+import Base from '../layouts/Base.astro';
+import ProductCard from '../components/ProductCard.astro';
+import Features from '../components/Features.astro';
+import Cta from '../components/Cta.astro';
+import GunSvg from '../components/GunSvg.astro';
+import { getFeaturedProducts } from '../lib/data';
+import { getLocale, useTranslations, localePath } from '../lib/i18n';
+
+const locale = getLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+
+const featured = await getFeaturedProducts(6);
+const heroProduct = featured[0];
+
+const stats = [
+  { num: '3', label: t('stats.series') },
+  { num: '50+', label: t('stats.models') },
+  { num: '8', label: t('stats.countries') },
+  { num: '15+', label: t('stats.years') },
+];
+---
+
+<Base>
+  <div class="hero">
+    <div class="hero-text">
+      <div class="hero-eyebrow">{t('hero.eyebrow')}</div>
+      <h1>{t('hero.title.lead')} <span>{t('hero.title.accent')}</span></h1>
+      <p>{t('hero.text')}</p>
+      <div class="hero-btns">
+        <a class="btn-primary" href={localePath(locale, '/catalog')}>{t('hero.cta.catalog')}</a>
+        <a class="btn-outline" href="https://youtube.com" target="_blank" rel="noopener">{t('hero.cta.video')}</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <GunSvg lengthMm={heroProduct?.lengthMm} category="gun" />
+        {heroProduct && (
+          <div class="hero-card-label">
+            <span class="hero-card-name">{heroProduct.name}</span>
+            <span class="hero-card-price">{heroProduct.priceRub.toLocaleString('ru-RU')} &#8381;</span>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+
+  <div class="stats">
+    {stats.map((stat) => (
+      <div class="stat-card">
+        <div class="stat-num">{stat.num}</div>
+        <div class="stat-label">{stat.label}</div>
+      </div>
+    ))}
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">{t('catalog.title')}</div>
+      <a href={localePath(locale, '/catalog')} class="section-link">{t('catalog.all')} <span>&rarr;</span></a>
+    </div>
+
+    <div class="products">
+      {featured.map((product) => <ProductCard product={product} />)}
+    </div>
+  </div>
+
+  <Features />
+
+  <Cta />
+</Base>

@@ -1,0 +1,64 @@
+---
+import type { Product } from '../lib/types';
+import { getLocale, useTranslations, localePath } from '../lib/i18n';
+import GunSvg from './GunSvg.astro';
+
+interface Props {
+  product: Product;
+}
+const { product } = Astro.props;
+
+const locale = getLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+
+const badgeLabel =
+  product.badge === 'hit' ? t('badge.hit')
+  : product.badge === 'new' ? t('badge.new')
+  : product.badge === 'sale' ? t('badge.sale')
+  : null;
+
+const chips = [
+  product.lengthMm ? `${product.lengthMm} мм` : null,
+  product.diameter ? `∅${product.diameter}` : null,
+  product.mechanism,
+].filter(Boolean) as string[];
+---
+
+<a
+  class="product-card"
+  href={localePath(locale, `/catalog/${product.slug}`)}
+  data-series={product.series ?? ''}
+  data-category={product.category}
+>
+  <div class="product-img">
+    {badgeLabel && <div class:list={['product-badge', product.badge]}>{badgeLabel}</div>}
+    <GunSvg lengthMm={product.lengthMm} category={product.category} />
+  </div>
+  <div class="product-info">
+    {product.series && <div class="product-series">{t('product.series')} {product.series}</div>}
+    <div class="product-name">{product.name}</div>
+    {chips.length > 0 && (
+      <div class="product-spec">
+        {chips.map((chip) => <span>{chip}</span>)}
+      </div>
+    )}
+    <div class="product-bottom">
+      <div>
+        <div class="product-price">{product.priceRub.toLocaleString('ru-RU')} &#8381;</div>
+        <span class="product-price-sub">{product.priceByn.toLocaleString('ru-RU')} бел.руб.</span>
+      </div>
+      <div class="product-actions">
+        <button
+          class="add-btn"
+          type="button"
+          aria-label={t('product.addToCart')}
+          data-add-to-cart
+          data-slug={product.slug}
+          data-name={product.name}
+          data-price-rub={product.priceRub}
+          data-price-byn={product.priceByn}
+        >+</button>
+      </div>
+    </div>
+  </div>
+</a>

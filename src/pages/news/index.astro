@@ -1,0 +1,35 @@
+---
+import Base from '../../layouts/Base.astro';
+import Cta from '../../components/Cta.astro';
+import { getPosts } from '../../lib/data';
+import { getLocale, useTranslations, localePath } from '../../lib/i18n';
+
+const locale = getLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+
+const posts = await getPosts();
+const dateFormat = new Intl.DateTimeFormat(locale === 'en' ? 'en-GB' : 'ru-RU', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+---
+
+<Base title={`${t('news.title')} — TALISMAN`}>
+  <div class="page-hero">
+    <h1>{t('news.title')}</h1>
+  </div>
+
+  <div class="post-list">
+    {posts.map((post) => (
+      <a class="post-card" href={localePath(locale, `/news/${post.slug}`)}>
+        <div class="post-date">{dateFormat.format(new Date(post.date))}</div>
+        <h2>{post.title}</h2>
+        <p>{post.excerpt}</p>
+        <span class="post-more">{t('news.readMore')} &rarr;</span>
+      </a>
+    ))}
+  </div>
+
+  <Cta />
+</Base>

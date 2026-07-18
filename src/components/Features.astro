@@ -1,0 +1,45 @@
+---
+import { getLocale, useTranslations } from '../lib/i18n';
+
+const locale = getLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+
+const items = [
+  {
+    title: t('features.serial.title'),
+    text: t('features.serial.text'),
+    icon: 'M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z',
+  },
+  {
+    title: t('features.warranty.title'),
+    text: t('features.warranty.text'),
+    icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+  },
+  {
+    title: t('features.disassembly.title'),
+    text: t('features.disassembly.text'),
+    icon: 'M12 6v6l4 2M12 22a10 10 0 100-20 10 10 0 000 20z',
+  },
+  {
+    title: t('features.delivery.title'),
+    text: t('features.delivery.text'),
+    icon: 'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0zM15 10a3 3 0 11-6 0 3 3 0 016 0z',
+  },
+];
+---
+
+<div class="section-header">
+  <div class="section-title">{t('features.title')}</div>
+</div>
+
+<div class="features">
+  {items.map((item) => (
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d={item.icon} /></svg>
+      </div>
+      <h3>{item.title}</h3>
+      <p>{item.text}</p>
+    </div>
+  ))}
+</div>
